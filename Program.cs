@@ -7,8 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<TechStoreDbContext>(options =>
-    options.UseSqlServer("Server=tcp:techstore.database.windows.net,1433;Initial Catalog=TechStore;Persist Security Info=False;User ID=MAdmin;Password=Martin1234;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));//The connection string is exposed for testing purposes
+builder.Configuration.AddJsonFile(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "GitSecrets.json"), optional: true);
+string? connectionString = builder.Configuration.GetConnectionString("TechStore") ?? builder.Configuration.GetConnectionString("DefaultConnection")!;
+
+builder.Services.AddDbContext<TechStoreDbContext>(options => options.UseMySQL(connectionString));
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
